@@ -75,6 +75,10 @@ module Mrb_Core
         end
     end
 
+    command:repo do |event|
+        return getTextFromKey("SOURCE_CODE_LINK", ["https://github.com/Krid3l/morobi"])
+    end
+
     command:info do |event|
         "```\n" +
         " __  __                 _     _\n" +

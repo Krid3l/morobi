@@ -19,13 +19,15 @@ module Mrb_Core_Text
             "eng" => {
                 "MODULE_OK" => "Core module correctly loaded.",
                 "SLOC_COUNT" => "I currently consist of $_VAL1 lines of Ruby code.",
-                "LANGUAGE_CHANGE_OK" => "I'll be speaking English from now on."
+                "LANGUAGE_CHANGE_OK" => "I'll be speaking English from now on.",
+                "SOURCE_CODE_LINK" => "The repository of my source code is here:\n$_VAL1"
             },
             "fra" => {
                 "MODULE_OK" => "Module principal correctement chargé.",
                 "SLOC_COUNT" => "Je consiste actuellement de $_VAL1 lignes de code en Ruby.",
                 "LANGUAGE_CHANGE_OK" => "Je parlerai désormais en français.\n"\
-                    "(Si les textes de mes puces additionnelles ont été traduits.)"
+                    "(Si les textes de mes puces additionnelles ont été traduits.)",
+                "SOURCE_CODE_LINK" => "Le dépôt de mon code source est ici:\n$_VAL1"
             }
         }
     end
