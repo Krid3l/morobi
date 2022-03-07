@@ -11,35 +11,6 @@ morobi = (
     prefix: MRB_CONFIG["COMMAND_PREFIX"]
 )
 
-# TODO: put the bot info in another file so that config.rb can be removed from
-#  the .gitignore
-=begin
-since config.rb is in the .gitignore, create your own from this template:
-
-module Mrb_Config
-
-def self.config
-    @config ||= {
-        "TOKEN" => <insert bot token as string here>,
-        "CLIENT_ID" => <insert client ID as integer here>,
-        "COMMAND_PREFIX" => "$_",
-        # expects an ISO 639-3 code, a.k.a. three-letter language code
-        # reference here: https://iso639-3.sil.org/code_tables/639/data
-        # NOTE FOR CONSTRUCTED LANGUAGE CREATORS:
-        # if you are translating / have translated one or several chips in a
-        #  constructed language, Morobi will let it slide if you input the
-        #  following language code: "cl?", where the question mark is replaced
-        #  by a single digit (that way there can be up to 10 conlangs per chip)
-        "DEFAULT_LANGUAGE" => "eng",
-        # chips are Morobi's modules -- the core chip is automatically loaded
-        #  specify the other chips you want to load on Morobi's startup below
-        "CHIPS" => [
-        ]
-    }
-end
-
-end
-=end
 default_lang = MRB_CONFIG["DEFAULT_LANGUAGE"].downcase
 
 chip_list = MRB_CONFIG["CHIPS"]

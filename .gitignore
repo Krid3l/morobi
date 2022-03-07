@@ -56,4 +56,4 @@ build-iPhoneSimulator/
 # .rubocop-https?--*
 
 # Morobi-specific
-config.rb
+creds.rb
