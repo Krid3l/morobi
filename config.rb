@@ -21,18 +21,31 @@ def self.config
         "TOKEN" => MRB_CREDS["TOKEN"],
         "CLIENT_ID" => MRB_CREDS["CLIENT_ID"],
         "COMMAND_PREFIX" => "$_",
-        # expects an ISO 639-3 code, a.k.a. three-letter language code
-        # reference here: https://iso639-3.sil.org/code_tables/639/data
-        # NOTE FOR CONSTRUCTED LANGUAGE CREATORS:
-        # if you are translating / have translated one or several chips in a
-        #  constructed language, Morobi will let it slide if you input the
-        #  following language code: "cl?", where the question mark is replaced
-        #  by a single digit (that way there can be up to 10 conlangs per chip)
-        "DEFAULT_LANGUAGE" => "fra",
+        # expects the name of a language in english, or the name of a conlang
+        # Morobi will try to fetch strings in this language when responding to
+        #  Discord users
+        "DEFAULT_LANGUAGE" => "english",
         # chips are Morobi's modules -- the core chip is automatically loaded
         #  specify the other chips you want to load on Morobi's startup below
         "CHIPS" => [
-        ]
+        ],
+        # if you are translating / have translated one or several chips in a
+        #  constructed language - or if the language is not specified in the
+        #  ISO 639 standard - you can define that language in the hash below
+        # the hashes are constructed like entry objects from the iso-639 gem
+        #  to simplify the language module and rely on a unified checkup method
+        # >>> see: https://github.com/xwmx/iso-639
+        #  (#alpha3_bibliographic is omitted since alpha3 is its alias)
+        # example entry:
+        #   "LANGUAGE_NAME_IN_CAPS" => {
+        #       "alpha3" => "3-letter lang code (english name)",
+        #       "alpha3_terminologic" => "3-letter lang code (native name)",
+        #       "alpha2" => "2-letter lang code",
+        #       "english_name" => "the full native name of the custom lang",
+        #       "french_name" => "can be a dupe of english_name if you want"
+        #   }
+        "CUSTOM_LANGUAGES" => {
+        }
     }
 end
 

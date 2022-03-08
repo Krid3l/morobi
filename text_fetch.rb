@@ -1,11 +1,24 @@
 module Mrb_TextFetcher
 
-def self.getText(key, text_module, text_module_path, current_lang, vals = [])
+# return the queried string from the appropriate <chip_name>_text.rb file
+# takes into account the language Morobi is currently set on for the given chip
+def self.getText(key, text_module, text_module_path, vals = [])
     require_relative text_module_path
-    text_to_return = text_module.text[current_lang][key]
+    text_to_return = text_module.text[$current_lang][key]
+
+    text_not_found = "Sorry, I could not fetch the queried string #{key} with language code #{$current_lang}."
 
     if text_to_return == ""
-        return "Sorry, I could not fetch the queried string #{key} with language code #{current_lang}."
+        if lang != "en"
+            ttr_english_fallback = text_module.text["en"][key]
+            if ttr_english_fallback == "" || ttr_english_fallback == nil
+                return text_not_found
+            else
+                text_to_return = ttr_english_fallback
+            end
+        else
+            return text_not_found
+        end
     end
 
     # -=-=-=- VALUE-INSERTION STEP -=-=-=- #

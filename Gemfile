@@ -3,3 +3,5 @@
 source 'https://rubygems.org'
 gem 'discordrb'
 gem 'unicode'
+gem 'iso-639'
+gem 'dead_end'

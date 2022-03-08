@@ -10,39 +10,30 @@ def self.chip_name
     @chip_name = File.basename(__FILE__, ".rb")
 end
 
+require "dead_end"
 require_relative "#{chip_name}_text"
 require_relative "../../text_fetch"
+require_relative "../../lang"
 
 # -=-=- Module vars -=-=- #
 # direct reference to this chip's text module
 def self.text_module
-    @text_module ||= Module.const_get("Mrb_" + Unicode::capitalize(chip_name) + "_Text")
+    @@text_module ||= Module.const_get("Mrb_" + Unicode::capitalize(chip_name) + "_Text")
 end
 
 def self.text_module_path
-    @text_module_path ||= File.dirname(__FILE__) + "/" + chip_name + "_text.rb"
+    @@text_module_path ||= File.dirname(__FILE__) + "/" + chip_name + "_text.rb"
 end
 
-# lang.rb will try to retrieve text in this language from the chip's text module
-def self.current_lang
-    @@current_lang
-end
 # -=-=- </module vars> -=-=- #
 
 # -=-=- Module methods -=-=- #
-def self.setLang(lang_code)
-    @@current_lang = lang_code
-end
-
+# I'm sure we can get rid of this by moving it in text_fetch.rb...
 def self.getTextFromKey(key, vals = [])
-    return Mrb_TextFetcher.getText(key, text_module, text_module_path, current_lang, vals)
+    return Mrb_TextFetcher.getText(key, text_module, text_module_path, vals)
 end
 # -=-=- </module methods> -=-=- #
 # -=-=-=- </boilerplate> -=-=-=- #
-
-command :helloCore do |event|
-    getTextFromKey("MODULE_OK")
-end
 
 command :randomNumber do |event, min, max|
     rand(min.to_i .. max.to_i)
@@ -56,22 +47,56 @@ command:slocCount do |event|
     getTextFromKey("SLOC_COUNT", [sloc_count])
 end
 
-command:changeLanguage do |event, lang_code|
-    # TODO: This is a quasi-dupe of some code present in morobi.rb
-    #  it'd be good to convert this into a method for the core chip
-    if lang_code == nil
-        return "You did not give me any language code to work with."
-    # is the provided lang_code constructed like an ISO 639-3 code
-    #  or one of Morobi's conlang codes?
-    elsif lang_code.match(/^[a-z]{3}$/) || lang_code.match(/^cl[0-9]{1}$/)
-        setLang(lang_code)
-        return getTextFromKey("LANGUAGE_CHANGE_OK")
+command:changeLanguage do |event, lang_name|
+    if lang_name == nil
+        return "You did not give me any language name to work with."
+    elsif $loaded_langs.has_key?(lang_name.upcase)
+        $current_lang = lang_name
+        return(
+            getTextFromKey("LANGUAGE_CHANGE_OK")
+        )
     else
         return(
-            "Hm. The language code \"#{default_lang}\" that you gave me is "\
-            "not a valid ISO 639-3 nor one of my constructed language codes.\n"\
-            "Check this out: https://iso639-3.sil.org/code_tables/639/data"
+            "Hm. The language name \"#{lang_name}\" that you gave me is not "\
+            "present in the ISO 639 standard, nor is it one of the custom "\
+            "languages defined in my config.\n"\
+            "For the list of languages that ISO 639 indexes, check this out: "\
+            "<https://www.loc.gov/standards/iso639-2/php/code_list.php>\n"\
+            "There's also the \"customLanguages\" command if you want to see "\
+            "the list of custom babble flavors I can spurt out."
         )
+    end
+end
+
+# TODO: Move response string to text_fetch.rb and translate it
+command:loadedLanguages do |event|
+    str_loaded_langs = ""
+    $loaded_langs.each do |lang_name_all_caps, lang_data|
+        str_loaded_langs += "#{lang_name_all_caps.capitalize};"
+    end
+    return "The following languages are loaded:\n#{str_loaded_langs}"
+end
+
+command:customLanguages do |event|
+    custom_langs = []
+    ($loaded_langs).each do |lang_name_all_caps, lang_data|
+        if lang_data["IS_CONLANG"]
+            custom_langs.push[lang_name_all_caps]
+        end
+    end
+    if custom_langs.empty?
+        return getTextFromKey("NO_CUSTOM_LANGUAGE_DEFINED")
+    else
+        stringed_custom_langs = ""
+        custom_langs_count = custom_langs.size
+        custom_langs.each do |custom_lang_name_all_caps|
+            stringed_custom_langs += custom_lang_name_all_caps.capitalize
+            if custom_langs_count > 1
+                stringed_custom_langs += ", "
+            end
+            custom_langs_count -= 1
+        end
+        return getTextFromKey("CUSTOM_LANGUAGES", [stringed_custom_langs])
     end
 end
 
