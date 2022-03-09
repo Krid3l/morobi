@@ -3,19 +3,21 @@ module Mrb_Core
 # TODO: See if this boilerplate can be moved in a separate file and
 #  retrieved by each loaded chip
 # -=-=-=- BOILERPLATE TO COPY FOR EACH NEW CHIP -=-=-=- #
+
 extend Discordrb::EventContainer
 extend Discordrb::Commands::CommandContainer
 
 def self.chip_name
+    # the 2nd argument prunes the substr, so we get the file name w/o extension
     @chip_name = File.basename(__FILE__, ".rb")
 end
 
-require "dead_end"
 require_relative "#{chip_name}_text"
 require_relative "../../text_fetch"
 require_relative "../../lang"
 
 # -=-=- Module vars -=-=- #
+
 # direct reference to this chip's text module
 def self.text_module
     @@text_module ||= Module.const_get("Mrb_" + Unicode::capitalize(chip_name) + "_Text")
@@ -28,17 +30,22 @@ end
 # -=-=- </module vars> -=-=- #
 
 # -=-=- Module methods -=-=- #
-# I'm sure we can get rid of this by moving it in text_fetch.rb...
+
+# helper that packs everything the text fetcher needs before querying a string
 def self.getTextFromKey(key, vals = [])
     return Mrb_TextFetcher.getText(key, text_module, text_module_path, vals)
 end
+
 # -=-=- </module methods> -=-=- #
+
 # -=-=-=- </boilerplate> -=-=-=- #
 
 command :randomNumber do |event, min, max|
     rand(min.to_i .. max.to_i)
 end
 
+# returns number of lines in all of Morobi's .rb files
+# TODO: make the command ignore Ruby comments in a not-too-bloated way
 command:slocCount do |event|
     sloc_count = 0
     for ruby_file in Dir["./**/*.rb"]
@@ -47,6 +54,8 @@ command:slocCount do |event|
     getTextFromKey("SLOC_COUNT", [sloc_count])
 end
 
+# will set the current language (stored in lang.rb) if the provided lang name
+#  is valid (as per lang.rb's checks)
 command:changeLanguage do |event, lang_name|
     if lang_name == nil
         return "You did not give me any language name to work with."
@@ -77,6 +86,7 @@ command:loadedLanguages do |event|
     return "The following languages are loaded:\n#{str_loaded_langs}"
 end
 
+# lists custom languages defined in config.rb
 command:customLanguages do |event|
     custom_langs = []
     ($loaded_langs).each do |lang_name_all_caps, lang_data|
@@ -91,6 +101,7 @@ command:customLanguages do |event|
         custom_langs_count = custom_langs.size
         custom_langs.each do |custom_lang_name_all_caps|
             stringed_custom_langs += custom_lang_name_all_caps.capitalize
+            # do not add a comma + space if last custom lang in the list
             if custom_langs_count > 1
                 stringed_custom_langs += ", "
             end

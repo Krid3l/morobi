@@ -7,9 +7,9 @@ def self.lang_list
     ]
 end
 
-# to allow for insertion of values inside Morobi's response strings, insert
-#  the substring $_VALx, where x is replaced by the position of this $_VAL
-#  occurrence, e.g.: $_VAL1, $_VAL2, $_VAL3, and so on
+# to allow for insertion of values inside Morobi's response strings, use a
+#  substring $_VALx, where x is replaced by the insertion order of the expected
+#  value, e.g.: $_VAL1, $_VAL2, $_VAL3, and so on
 #  start with 1, not with 0
 # upon recieving a piece of text with one or several instances of $_VALx in
 #  it, text_fetch.rb will replace every occurrence with the value(s)

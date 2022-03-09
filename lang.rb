@@ -38,6 +38,7 @@ def self.loadDefaultLang
     end
 end
 
+# TODO: write a getLangByCode too and apply it to morobi.rb's checks
 def self.getLangByName(lang_name)
     iso_639_lookup = ISO_639.find_by_english_name(lang_name.capitalize)
     # is that language code / name found in the ISO 639 referential?

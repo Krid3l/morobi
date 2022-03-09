@@ -6,6 +6,7 @@ require_relative "lang"
 
 MRB_CONFIG = Mrb_Config.config
 
+# the acutal bot instance
 morobi = (
     Discordrb::Commands::CommandBot.new token: MRB_CONFIG["TOKEN"],
     client_id: MRB_CONFIG["CLIENT_ID"],
@@ -18,6 +19,7 @@ chip_list = MRB_CONFIG["CHIPS"]
 # ensures that the core chip is loaded first
 chip_list.unshift("core")
 
+# checks if the default language specified in config.rb is valid, then loads it
 Mrb_Lang.loadDefaultLang()
 
 for chip in MRB_CONFIG["CHIPS"] do
@@ -29,6 +31,9 @@ for chip in MRB_CONFIG["CHIPS"] do
 
     # -=-=-=- CHIP-LEVEL LANGUAGE-RELATED CHECKS -=-=-=- #
 
+    # since Morobi falls back on English when translated strings are not
+    #  available in a given chip's text module, we assume that English text
+    #  should be readily grabbable
     chip_has_english_text = true
 
     unless chip_text_module.lang_list.include?("english")
@@ -54,7 +59,7 @@ for chip in MRB_CONFIG["CHIPS"] do
     chip_text_module.lang_list.each do |lang_name|
         # people working on the translation of a chip's text should not be
         #  bothered with errors on startup; a translator can include any lang
-        #  code as a key in the chip's text hash, even if the same lang code is
+        #  name as a key in the chip's text hash, even if the same lang name is
         #  not in the lang_list - however the opposite case should be prevented
         unless chip_text_module.text.has_key?(lang_name)
             puts(
@@ -65,6 +70,8 @@ for chip in MRB_CONFIG["CHIPS"] do
             exit
         end
         # TODO: english is loaded twice when processing the core chip, fix this
+        #  it seems that english is loaded even before the first call to
+        #  loadLang, maybe the problem lies in lang.rb directly?
         Mrb_Lang.loadLang(lang_name)
     end
 
