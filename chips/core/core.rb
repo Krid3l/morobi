@@ -33,20 +33,28 @@ end
 
 # helper that packs everything the text fetcher needs before querying a string
 def self.getTextFromKey(key, vals = [])
-    return Mrb_TextFetcher.getText(key, text_module, text_module_path, vals)
+    return Mrb_TextFetcher.getText(key, text_module, vals)
 end
 
 # -=-=- </module methods> -=-=- #
 
 # -=-=-=- </boilerplate> -=-=-=- #
 
-command :randomNumber do |event, min, max|
-    rand(min.to_i .. max.to_i)
+command :randomNumber do |event, min, max, how_many|
+    random_numbers = []
+    # does not work -- classic loop inbound!
+    iter = how_many.to_i
+    until iter <= 0
+        random_numbers.push(rand(min.to_i .. max.to_i))
+        iter -= 1
+    end
+    # ça peut pas être aussi con que ça...
+    return random_numbers.to_s
 end
 
 # returns number of lines in all of Morobi's .rb files
 # TODO: make the command ignore Ruby comments in a not-too-bloated way
-command:slocCount do |event|
+command :slocCount do |event|
     sloc_count = 0
     for ruby_file in Dir["./**/*.rb"]
         sloc_count += File.foreach(ruby_file).inject(0) {|c, line| c+1}
@@ -56,7 +64,7 @@ end
 
 # will set the current language (stored in lang.rb) if the provided lang name
 #  is valid (as per lang.rb's checks)
-command:changeLanguage do |event, lang_name|
+command :changeLanguage do |event, lang_name|
     if lang_name == nil
         return "You did not give me any language name to work with."
     elsif $loaded_langs.has_key?(lang_name.upcase)
@@ -78,7 +86,7 @@ command:changeLanguage do |event, lang_name|
 end
 
 # TODO: Move response string to text_fetch.rb and translate it
-command:loadedLanguages do |event|
+command :loadedLanguages do |event|
     str_loaded_langs = ""
     $loaded_langs.each do |lang_name_all_caps, lang_data|
         str_loaded_langs += "#{lang_name_all_caps.capitalize};"
@@ -87,7 +95,7 @@ command:loadedLanguages do |event|
 end
 
 # lists custom languages defined in config.rb
-command:customLanguages do |event|
+command :customLanguages do |event|
     custom_langs = []
     ($loaded_langs).each do |lang_name_all_caps, lang_data|
         if lang_data["IS_CONLANG"]
@@ -111,11 +119,49 @@ command:customLanguages do |event|
     end
 end
 
-command:repo do |event|
+command :repo do |event|
     return getTextFromKey("SOURCE_CODE_LINK", ["https://github.com/Krid3l/morobi"])
 end
 
-command:info do |event|
+# TODO: add an option in config.rb to "blacklist" commands so they're not
+#  visible when using :help, e.g. if you want to test your new command in peace
+#  without users from your server using it
+# also, restrict the dir scanning to the chips folder?
+# plus, it'd be good to have command descriptions directly in the code, perhaps
+#  via RDoc?
+command :help do |event|
+    # key = command name, value = array of arguments to give to that command
+    command_list = {}
+    for morobi_file in Dir["./**/*.rb"]
+        for line in IO.readlines(morobi_file)
+            if line.start_with?("command")
+                command_name = (line.split)[1].sub(":", "")
+                command_args = (line[/\|(.*?)\|/m, 1])
+                for event_variation in ["event, ", "event,", "event"]
+                    command_args = command_args.gsub(event_variation, "")
+                end
+                command_list.merge!(
+                    {
+                        command_name => command_args
+                    }
+                )
+            end
+        end
+    end
+    # compose response
+    response = getTextFromKey("HELP") + "\n```\n"
+    command_list.each do |cmd_name_key, cmd_args_value|
+        response += "#{cmd_name_key}"
+        unless cmd_args_value == ""
+            response += " (#{cmd_args_value})"
+        end
+        response += "\n"
+    end
+    response += "```"
+    return response
+end
+
+command :info do |event|
     "```\n" +
     " __  __                 _     _\n" +
     "|  \\/  |               | |   (_)\n" +

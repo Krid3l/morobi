@@ -1,5 +1,6 @@
 require "discordrb"
 require "unicode"
+require "dead_end"
 
 require_relative "config"
 require_relative "lang"
@@ -74,6 +75,8 @@ for chip in MRB_CONFIG["CHIPS"] do
         #  loadLang, maybe the problem lies in lang.rb directly?
         Mrb_Lang.loadLang(lang_name)
     end
+
+    $current_lang = $default_lang
 
     # -=-=-=- </chip-level language checks> -=-=-=- #
 
