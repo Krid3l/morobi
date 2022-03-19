@@ -1,6 +1,10 @@
+##
+# Morobi's configuration file.
 module Mrb_Config
 
-# put your bot's credentials in a file named creds.rb inside a Ruby module:
+# put your bot's credentials in a file named creds.rb inside a Ruby module
+# here's the template:
+#
 #   module Mrb_Creds
 #
 #   def self.creds
@@ -11,6 +15,7 @@ module Mrb_Config
 #   end
 #
 #   end
+#
 
 require_relative "creds"
 

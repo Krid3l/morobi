@@ -1,5 +1,8 @@
 module Mrb_Core_Text
 
+##
+# Use this in the chips to easily check which languages names have been already
+# looked-up and validated by the +lang+ module
 def self.lang_list
     @lang_list ||= [
         "english",
@@ -7,13 +10,14 @@ def self.lang_list
     ]
 end
 
-# to allow for insertion of values inside Morobi's response strings, use a
-#  substring $_VALx, where x is replaced by the insertion order of the expected
-#  value, e.g.: $_VAL1, $_VAL2, $_VAL3, and so on
-#  start with 1, not with 0
-# upon recieving a piece of text with one or several instances of $_VALx in
-#  it, text_fetch.rb will replace every occurrence with the value(s)
-#  transmitted to its self.getText method
+##
+# To allow for insertion of values inside Morobi's response strings, use a
+# substring $_VALx, where x is replaced by the insertion order of the expected
+# value, e.g.: $_VAL1, $_VAL2, $_VAL3, and so on (start with 1, not with 0)
+#
+# Upon recieving a piece of text with one or several instances of $_VALx in
+# it, text_fetch.rb will replace every occurrence with the value(s)
+# transmitted to its self.getText method
 def self.text
     @text ||= {
         "english" => {
@@ -23,10 +27,7 @@ def self.text
             "SOURCE_CODE_LINK" => "The repository of my source code is here:\n$_VAL1",
             "CUSTOM_LANGUAGES" => "My host has defined the following custom language(s):\n$_VAL1",
             "NO_CUSTOM_LANGUAGE_DEFINED" => "My host has not defined any custom language(s) yet.",
-            "HELP" => "Here's the list of my available commands.\n"\
-                # TODO in core:
-                #"To get a more complete description for a given command, "\
-                #"use `help` followed by the command name. (e.g. $_VAL1help pizza)"
+            "HELP" => "Here's the list of my available commands.",
         },
         "french" => {
             "MODULE_OK" => "Module principal correctement chargé.",
@@ -36,10 +37,7 @@ def self.text
             "SOURCE_CODE_LINK" => "Le dépôt de mon code source est ici:\n$_VAL1",
             "CUSTOM_LANGUAGES" => "Mon hôte a défini la/les langue(s) personnalisées suivantes:\n$_VAL1",
             "NO_CUSTOM_LANGUAGE_DEFINED" => "Mon hôte n'a pas encore défini de langue(s) personnalisée(s).",
-            "HELP" => "Voici la liste de mes commandes disponibles.\n"\
-                # TODO in core:
-                #"Pour obtenir une description plus complète d'une commande donnée, "\
-                #"utilisez `help` suivi du nom de la commande. (par ex. : `$_VAL1help pizza`)"
+            "HELP" => "Voici la liste de mes commandes disponibles."
         }
     }
 end

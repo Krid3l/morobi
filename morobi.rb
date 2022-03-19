@@ -1,3 +1,14 @@
+##
+# Morobi is a multi-purpose and modular bot with a primitive multilingual
+# engine being tailor-made for my personal Discord server.
+#
+# This is Morobi's main file, and the one that starts her up.
+#
+# Globals count: 2
+# - +command_prefix+ : What it says on the tin. Retrieved from the +config+.
+# - +chip_list+ : List of chips to be validated and loaded before calling run().
+module Morobi
+
 require "discordrb"
 require "unicode"
 require "dead_end"
@@ -85,3 +96,5 @@ for chip in $chip_list do
 end
 
 morobi.run
+
+end

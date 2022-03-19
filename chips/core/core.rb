@@ -1,3 +1,5 @@
+##
+# Morobi's core chip. Loaded by default when Morobi starts.
 module Mrb_Core
 
 # -=-=- Copy this when creating a new chip -=-=- #
@@ -6,13 +8,17 @@ chip_name = File.basename(__FILE__).sub(".rb", "")
 require_relative "../common"
 require_relative "#{chip_name}_text"
 
+# instance of common.rb, a.k.a. Morobi's chips' common toolbox.
 common = Mrb_Chip_Common.new(chip_name, Module.const_get("Mrb_#{chip_name.capitalize}_Text"))
 
 extend Discordrb::EventContainer
 extend Discordrb::Commands::CommandContainer
-
 # -=-=- < /chip boilerplate > -=-=- #
 
+##
+# Discord command.
+#
+# Displays +how_many+ random numbers, whose values are between +min+ and +max+.
 command :randomNumber do |event, min, max, how_many|
     random_numbers = []
     # iteration on the array does not work?... classic loop inbound!
@@ -24,8 +30,12 @@ command :randomNumber do |event, min, max, how_many|
     return random_numbers.to_s
 end
 
-# returns number of lines in all of Morobi's .rb files
-# TODO: make the command ignore Ruby comments in a not-too-bloated way
+##
+# Discord command.
+#
+# Displays the number of lines in all of Morobi's .rb files.
+# 
+# TODO: Make the command ignore Ruby comments in a not-too-bloated way.
 command :slocCount do |event|
     sloc_count = 0
     for ruby_file in Dir["./**/*.rb"]
@@ -34,8 +44,11 @@ command :slocCount do |event|
     common.getTextFromKey("SLOC_COUNT", [sloc_count])
 end
 
-# will set the current language (stored in lang.rb) if the provided lang name
-#  is valid (as per lang.rb's checks)
+##
+# Discord command.
+#
+# Will set the current language (stored in lang.rb) if the provided lang name
+# is valid (as per lang.rb's checks).
 command :changeLanguage do |event, lang_name|
     puts $loaded_langs
     if lang_name == nil
@@ -60,7 +73,12 @@ command :changeLanguage do |event, lang_name|
     end
 end
 
-# TODO: Move response string to text_fetch.rb and translate it
+##
+# Discord command.
+# 
+# Lists the languages that have already been validated by lang.rb.
+#
+# TODO: Move response string to text_fetch.rb and translate it.
 command :loadedLanguages do |event|
     str_loaded_langs = ""
     $loaded_langs.each do |lang_name_all_caps, lang_data|
@@ -69,7 +87,10 @@ command :loadedLanguages do |event|
     return "The following languages are loaded:\n#{str_loaded_langs}"
 end
 
-# lists custom languages defined in config.rb
+##
+# Discord command.
+#
+# Lists the custom languages defined in config.rb.
 command :customLanguages do |event|
     custom_langs = []
     ($loaded_langs).each do |lang_name_all_caps, lang_data|
@@ -98,12 +119,19 @@ command :repo do |event|
     return common.getTextFromKey("SOURCE_CODE_LINK", ["https://github.com/Krid3l/morobi"])
 end
 
-# TODO: add an option in config.rb to "blacklist" commands so they're not
-#  visible when using :help, e.g. if you want to test your new command in peace
-#  without users from your server using it
-# also, restrict the dir scanning to the chips folder?
-# plus, it'd be good to have command descriptions directly in the code, perhaps
-#  via RDoc?
+##
+# Discord command.
+#
+# Displays the list of available commands within loaded chips.
+#
+# TODO: Add an option in config.rb to "blacklist" commands so they're not
+# visible when using the help command.
+#
+# e.g. if you want to test your new command in peace without users from your
+# server using it.
+#
+# TODO 2: Return the command's description if the command name is provided as
+# first argument.
 command :help do |event|
     # key = command name, value = array of arguments to give to that command
     command_list = {}
@@ -123,8 +151,8 @@ command :help do |event|
             end
         end
     end
-    # compose response
-    response = common.getTextFromKey("HELP", [$command_prefix]) + "\n```\n"
+    # response-composing step
+    response = common.getTextFromKey("HELP") + "\n```\n"
     ptr = 0
     command_list.each_key do |chip_name|
         ptr += 1
@@ -144,6 +172,10 @@ command :help do |event|
     return response
 end
 
+##
+# Discord command.
+#
+# Displays a handful of hard-coded info about Morobi, with some formatting.
 command :info do |event|
     "```\n" +
     " __  __                 _     _\n" +

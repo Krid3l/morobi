@@ -1,3 +1,20 @@
+##
+# This is Morobi's primitive multilingual engine.
+#
+# Its main purpose is to allow displaying responses to Discord commands in
+# several languages.
+#
+# For that, the chip containing the command must have a translation of the
+# response string it its associated _text.rb module.
+#
+# Morobi will try falling back to English if there's no appropriate translation.
+#
+# Globals count: 3
+# - +default_lang+ : The language set as default in the +config+.
+# - +current_lang+ : The language Morobi is currently set in, and the one in 
+#   which Morobi will attempt to fetch response strings.
+# - +loaded_langs+ : A lookup table to avoid running language-validation checks
+#   multiple times for the same language.
 module Mrb_Lang
 
 require_relative "config"
@@ -9,6 +26,13 @@ $default_lang = MRB_CONFIG["DEFAULT_LANGUAGE"].downcase
 $current_lang = ""
 $loaded_langs = {}
 
+##
+# If the language name is validated (see +getLangByName+), it's pushed to the
+# +loaded_langs+ global
+#
+# TODO: Allow searching a language with its 2/3-letter code or its native name
+# (iso-639's search() can do that, but we need additional validation on
+# Morobi's side).
 def self.loadLang(lang_name)
     if $loaded_langs.has_key?(lang_name.upcase)
         puts "[INFO] Language \"#{lang_name}\" already loaded."
@@ -28,6 +52,9 @@ def self.loadLang(lang_name)
     end
 end
 
+##
+# Helper calling +loadLang+ to validate the default language specified in the
+# +config+.
 def self.loadDefaultLang
     if $default_lang == ""
         puts "[ERROR] No language code specified in config.rb.\n"\
@@ -37,8 +64,10 @@ def self.loadDefaultLang
         loadLang($default_lang)
     end
 end
-
-# TODO: write a getLangByCode too and apply it to morobi.rb's checks
+##
+# Returns a hash with language info if the provided language name is either:
+# - A valid ISO 639 entry
+# - A custom language found in the +config+.
 def self.getLangByName(lang_name)
     iso_639_lookup = ISO_639.find_by_english_name(lang_name.capitalize)
     # is that language code / name found in the ISO 639 referential?

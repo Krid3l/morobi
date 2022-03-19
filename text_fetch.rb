@@ -1,7 +1,9 @@
 module Mrb_TextFetcher
 
-# return the queried string from the appropriate <chip_name>_text.rb file
-# takes into account the language Morobi is currently set on for the given chip
+##
+# Returns the queried string from the appropriate <chip_name>_text.rb file.
+#
+# Takes into account the language Morobi is currently set on.
 def self.getText(key, text_module, vals = [])
     # TODO: Sometimes $current_lang = nothing, wtf?
     text_to_return = text_module.text[$current_lang][key]
