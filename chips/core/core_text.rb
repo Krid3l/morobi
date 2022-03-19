@@ -23,7 +23,10 @@ def self.text
             "SOURCE_CODE_LINK" => "The repository of my source code is here:\n$_VAL1",
             "CUSTOM_LANGUAGES" => "My host has defined the following custom language(s):\n$_VAL1",
             "NO_CUSTOM_LANGUAGE_DEFINED" => "My host has not defined any custom language(s) yet.",
-            "HELP" => "Here's the list of my available commands:"
+            "HELP" => "Here's the list of my available commands.\n"\
+                # TODO in core:
+                #"To get a more complete description for a given command, "\
+                #"use `help` followed by the command name. (e.g. $_VAL1help pizza)"
         },
         "french" => {
             "MODULE_OK" => "Module principal correctement chargé.",
@@ -33,7 +36,10 @@ def self.text
             "SOURCE_CODE_LINK" => "Le dépôt de mon code source est ici:\n$_VAL1",
             "CUSTOM_LANGUAGES" => "Mon hôte a défini la/les langue(s) personnalisées suivantes:\n$_VAL1",
             "NO_CUSTOM_LANGUAGE_DEFINED" => "Mon hôte n'a pas encore défini de langue(s) personnalisée(s).",
-            "HELP" => "Voici la liste de mes commandes disponibles:"
+            "HELP" => "Voici la liste de mes commandes disponibles.\n"\
+                # TODO in core:
+                #"Pour obtenir une description plus complète d'une commande donnée, "\
+                #"utilisez `help` suivi du nom de la commande. (par ex. : `$_VAL1help pizza`)"
         }
     }
 end

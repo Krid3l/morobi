@@ -107,30 +107,38 @@ end
 command :help do |event|
     # key = command name, value = array of arguments to give to that command
     command_list = {}
-    for morobi_file in Dir["./**/*.rb"]
-        for line in IO.readlines(morobi_file)
-            if line.start_with?("command")
+    # TODO: only parses the main chip file, check for multiple files in chip
+    for chip in $chip_list do
+        command_list.merge!(
+            chip => {}
+        )
+        for line in IO.readlines("chips/#{chip}/#{chip}.rb")
+            if line.start_with?("command")   
                 command_name = (line.split)[1].sub(":", "")
                 command_args = (line[/\|(.*?)\|/m, 1])
                 for event_variation in ["event, ", "event,", "event"]
                     command_args = command_args.gsub(event_variation, "")
                 end
-                command_list.merge!(
-                    {
-                        command_name => command_args
-                    }
-                )
+                command_list[chip].merge!({command_name => command_args})
             end
         end
     end
     # compose response
-    response = common.getTextFromKey("HELP") + "\n```\n"
-    command_list.each do |cmd_name_key, cmd_args_value|
-        response += "#{cmd_name_key}"
-        unless cmd_args_value == ""
-            response += " (#{cmd_args_value})"
+    response = common.getTextFromKey("HELP", [$command_prefix]) + "\n```\n"
+    ptr = 0
+    command_list.each_key do |chip_name|
+        ptr += 1
+        response += "#{chip_name.capitalize} chip\n-=-=-=-=-\n"
+        command_list[chip_name].each do |cmd_name_key, cmd_args_value|
+            response += "#{cmd_name_key}"
+            unless cmd_args_value == ""
+                response += " (#{cmd_args_value})"
+            end
+            response += "\n"
         end
-        response += "\n"
+        if ptr < command_list.size()
+            response += "\n"
+        end
     end
     response += "```"
     return response

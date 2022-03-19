@@ -15,15 +15,16 @@ morobi = (
 )
 
 default_lang = MRB_CONFIG["DEFAULT_LANGUAGE"].downcase
+$command_prefix = MRB_CONFIG["COMMAND_PREFIX"]
 
-chip_list = MRB_CONFIG["CHIPS"]
+$chip_list = MRB_CONFIG["CHIPS"]
 # ensures that the core chip is loaded first
-chip_list.unshift("core")
+$chip_list.unshift("core")
 
 # checks if the default language specified in config.rb is valid, then loads it
 Mrb_Lang.loadDefaultLang()
 
-for chip in MRB_CONFIG["CHIPS"] do
+for chip in $chip_list do
     require_relative "chips/" + chip + "/" + chip
     require_relative "chips/" + chip + "/" + chip + "_text"
 
