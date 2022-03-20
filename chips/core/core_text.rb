@@ -1,8 +1,14 @@
+##
+# Contains the core chip's response strings.
 module Mrb_Core_Text
 
 ##
-# Use this in the chips to easily check which languages names have been already
-# looked-up and validated by the +lang+ module
+# List of languages in which response strings can be fetched from this text
+# module. These are looked-up and validated by the +lang+ module.
+#
+# If you are working on a translation in the .json file, Morobi won't mind if
+# one of lang_list's languages are not in @text. So you can input the new
+# language's name whenever you want.
 def self.lang_list
     @lang_list ||= [
         "english",
@@ -10,36 +16,34 @@ def self.lang_list
     ]
 end
 
+# -=-=-=- DON'T CHANGE ANYTHING BELOW unless you're modifying Morobi -=-=-=- #
+
 ##
 # To allow for insertion of values inside Morobi's response strings, use a
 # substring $_VALx, where x is replaced by the insertion order of the expected
-# value, e.g.: $_VAL1, $_VAL2, $_VAL3, and so on (start with 1, not with 0)
+# value, e.g.: $_VAL1, $_VAL2, $_VAL3, and so on (start with 1, not with 0).
 #
 # Upon recieving a piece of text with one or several instances of $_VALx in
 # it, text_fetch.rb will replace every occurrence with the value(s)
-# transmitted to its self.getText method
+# transmitted to its self.getText method.
 def self.text
-    @text ||= {
-        "english" => {
-            "MODULE_OK" => "Core module correctly loaded.",
-            "SLOC_COUNT" => "I currently consist of $_VAL1 lines of Ruby code.",
-            "LANGUAGE_CHANGE_OK" => "I'll be speaking English from now on.",
-            "SOURCE_CODE_LINK" => "The repository of my source code is here:\n$_VAL1",
-            "CUSTOM_LANGUAGES" => "My host has defined the following custom language(s):\n$_VAL1",
-            "NO_CUSTOM_LANGUAGE_DEFINED" => "My host has not defined any custom language(s) yet.",
-            "HELP" => "Here's the list of my available commands.",
-        },
-        "french" => {
-            "MODULE_OK" => "Module principal correctement chargé.",
-            "SLOC_COUNT" => "Je suis actuellement composée de $_VAL1 lignes de code en Ruby.",
-            "LANGUAGE_CHANGE_OK" => "Je parlerai désormais en français.\n"\
-                "(Si les textes de mes puces additionnelles ont été traduits.)",
-            "SOURCE_CODE_LINK" => "Le dépôt de mon code source est ici:\n$_VAL1",
-            "CUSTOM_LANGUAGES" => "Mon hôte a défini la/les langue(s) personnalisées suivantes:\n$_VAL1",
-            "NO_CUSTOM_LANGUAGE_DEFINED" => "Mon hôte n'a pas encore défini de langue(s) personnalisée(s).",
-            "HELP" => "Voici la liste de mes commandes disponibles."
-        }
-    }
+    @text ||= {}
+end
+
+require "json"
+
+chip_name = File.basename(__FILE__).sub("_text.rb", "")
+json_file = File.read("chips/#{chip_name}/#{chip_name}_text.json")
+text = JSON.parse(json_file)
+lang_list.each do |lang_name|
+    unless text.key?(lang_name)
+        puts (
+            "[ERROR] Language \"#{lang_name}\" is defined in "\
+            "#{chip_name}_text.rb's language list, but is not in the "\
+            "translations provided by the companion .json file.\nExiting..."
+        )
+        exit
+    end
 end
 
 end

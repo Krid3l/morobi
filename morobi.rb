@@ -70,18 +70,6 @@ for chip in $chip_list do
     end
 
     chip_text_module.lang_list.each do |lang_name|
-        # people working on the translation of a chip's text should not be
-        #  bothered with errors on startup; a translator can include any lang
-        #  name as a key in the chip's text hash, even if the same lang name is
-        #  not in the lang_list - however the opposite case should be prevented
-        unless chip_text_module.text.has_key?(lang_name)
-            puts(
-                "[ERROR] Language \"#{lang_name}\" has not been defined in "\
-                "#{chip}_text.rb's \"text\" hash, but is in the chip's lang_list.\n"\
-                "Exiting..."
-            )
-            exit
-        end
         # TODO: english is loaded twice when processing the core chip, fix this
         #  it seems that english is loaded even before the first call to
         #  loadLang, maybe the problem lies in lang.rb directly?

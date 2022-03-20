@@ -7,8 +7,6 @@
 # For that, the chip containing the command must have a translation of the
 # response string it its associated _text.rb module.
 #
-# Morobi will try falling back to English if there's no appropriate translation.
-#
 # Globals count: 3
 # - +default_lang+ : The language set as default in the +config+.
 # - +current_lang+ : The language Morobi is currently set in, and the one in 

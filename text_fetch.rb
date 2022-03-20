@@ -1,9 +1,11 @@
+##
+# Tries to fetch a response string from a text module in Morobi's current language.
+#
+# Morobi will try falling back to English if there's no appropriate translation.
 module Mrb_TextFetcher
 
 ##
 # Returns the queried string from the appropriate <chip_name>_text.rb file.
-#
-# Takes into account the language Morobi is currently set on.
 def self.getText(key, text_module, vals = [])
     # TODO: Sometimes $current_lang = nothing, wtf?
     text_to_return = text_module.text[$current_lang][key]
