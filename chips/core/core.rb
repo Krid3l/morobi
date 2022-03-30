@@ -8,8 +8,10 @@ chip_name = File.basename(__FILE__).sub(".rb", "")
 require_relative "../common"
 require_relative "#{chip_name}_text"
 
+text_module_ref = Module.const_get("Mrb_#{chip_name.capitalize}_Text")
+
 # instance of common.rb, a.k.a. Morobi's chips' common toolbox.
-common = Mrb_Chip_Common.new(chip_name, Module.const_get("Mrb_#{chip_name.capitalize}_Text"))
+common = Mrb_Chip_Common.new(chip_name, text_module_ref)
 
 extend Discordrb::EventContainer
 extend Discordrb::Commands::CommandContainer
@@ -41,7 +43,7 @@ command :slocCount do |event|
     for ruby_file in Dir["./**/*.rb"]
         sloc_count += File.foreach(ruby_file).inject(0) {|c, line| c+1}
     end
-    common.getTextFromKey("SLOC_COUNT", [sloc_count])
+    return common.getTextFromKey("SLOC_COUNT", [sloc_count])
 end
 
 ##

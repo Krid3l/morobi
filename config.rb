@@ -33,6 +33,7 @@ def self.config
         # chips are Morobi's modules -- the core chip is automatically loaded
         #  specify the other chips you want to load on Morobi's startup below
         "CHIPS" => [
+            "gamedict"
         ],
         # if you are translating / have translated one or several chips in a
         #  constructed language - or if the language is not specified in the

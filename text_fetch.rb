@@ -7,7 +7,6 @@ module Mrb_TextFetcher
 ##
 # Returns the queried string from the appropriate <chip_name>_text.rb file.
 def self.getText(key, text_module, vals = [])
-    # TODO: Sometimes $current_lang = nothing, wtf?
     text_to_return = text_module.text[$current_lang][key]
 
     text_not_found = "Sorry, I could not fetch the queried string #{key} with language code #{$current_lang}."

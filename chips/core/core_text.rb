@@ -1,5 +1,8 @@
 ##
-# Contains the core chip's response strings.
+# Contains the core chip's response strings loaded from the sibling .json file.
+#
+# This should be used as a template for any new chip's _text file.
+# Apart from the module name and lang_list, there's nothing to change.
 module Mrb_Core_Text
 
 ##
@@ -27,23 +30,27 @@ end
 # it, text_fetch.rb will replace every occurrence with the value(s)
 # transmitted to its self.getText method.
 def self.text
-    @text ||= {}
+    @text ||= loadText()
 end
 
-require "json"
+def self.loadText
+    require "json"
 
-chip_name = File.basename(__FILE__).sub("_text.rb", "")
-json_file = File.read("chips/#{chip_name}/#{chip_name}_text.json")
-text = JSON.parse(json_file)
-lang_list.each do |lang_name|
-    unless text.key?(lang_name)
-        puts (
-            "[ERROR] Language \"#{lang_name}\" is defined in "\
-            "#{chip_name}_text.rb's language list, but is not in the "\
-            "translations provided by the companion .json file.\nExiting..."
-        )
-        exit
+    chip_name = File.basename(__FILE__).sub("_text.rb", "")
+    json_file = File.read("chips/#{chip_name}/#{chip_name}_text.json")
+    loaded_text = JSON.parse(json_file)
+    lang_list.each do |lang_name|
+        unless loaded_text.key?(lang_name)
+            puts (
+                "[ERROR] Language \"#{lang_name}\" is defined in "\
+                "#{chip_name}_text.rb's language list, but is not in the "\
+                "translations provided by the companion .json file.\nExiting..."
+            )
+            exit
+        end
     end
+
+    return loaded_text
 end
 
 end
