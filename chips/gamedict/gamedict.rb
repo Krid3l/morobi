@@ -187,7 +187,7 @@ command :gameCard do |event, game_name_with_underscores|
     game_info["TAGS"].each do |tag|
         tag_ptr += 1
         tags_string += tag
-        if tag_ptr >= game_info["TAGS"].length
+        unless tag_ptr >= game_info["TAGS"].length
             tags_string += ", "
         end
     end
