@@ -10,7 +10,8 @@ module Mrb_Config
 #   def self.creds
 #       @creds ||= { 
 #           "TOKEN" => "your bot's token here, with the quotes",
-#           "CLIENT_ID" => your bot's client id here, without quotes
+#           "CLIENT_ID" => your bot's client id here, without quotes,
+#           "ADMIN_ROLE" => "the name of your server's admin role, with quotes"
 #       }
 #   end
 #
@@ -25,6 +26,7 @@ def self.config
     @config ||= {
         "TOKEN" => MRB_CREDS["TOKEN"],
         "CLIENT_ID" => MRB_CREDS["CLIENT_ID"],
+        "ADMIN_ROLE" => MRB_CREDS["ADMIN_ROLE"],
         "COMMAND_PREFIX" => "$_",
         # expects the name of a language in english, or the name of a conlang
         # Morobi will try to fetch strings in this language when responding to

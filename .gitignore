@@ -57,3 +57,4 @@ build-iPhoneSimulator/
 
 # Morobi-specific
 creds.rb
+chips/**/gamedict_entries.json

@@ -2,13 +2,32 @@
 # The Game Dictionary chip provides Morobi with a simple system to store a
 # repertoire of games for your Discord server.
 #
-# All entries must be stored in +gamedict_entries.json+.
-#
 # Example uses:
 # - Allowing users to quickly see which games are usually played by the server
 #   members without relying on a dedicated channel with a long list of games
 # - Transmitting the precompiled games list from this module to other Morobi
 #   chips related to gaming
+#
+# This chip must have a +gamedict_entries.json+ to work ; it will create an
+# empty one if no existing instance is found. All entries must be stored in
+# this file.
+#
+# Each top-level entry in gamedict_entries.json is a category.
+# Each second-level entry is a single game.
+#
+# Example :
+#  "Category name": {
+#      "Name of first game": {
+#          "icon": "optional - insert hyperlink to an image file here",
+#          "year": 2022,
+#          "platforms": ["insert platforms on which the game runs as three-letter codes, see convert_platform_codes() for the list of codes"],
+#          "performance": how powerful of a computer to run this game? 1: toaster, 2: decent PC, 3: recent gaming PC,
+#          "tags": ["all these tags will be displayed as a list when the game card is displayed"]
+#      }
+#      "Name of second game": {
+#          "and so on..."
+#      }
+#  }
 module Mrb_Gamedict
 
 # -=-=- Copy this when creating a new chip -=-=- #
@@ -26,6 +45,9 @@ extend Discordrb::EventContainer
 extend Discordrb::Commands::CommandContainer
 # -=-=- < /chip boilerplate > -=-=- #
 
+require "json"
+require "open-uri"
+
 def self.entries_file
     @entries_file ||= "gamedict_entries.json"
 end
@@ -37,14 +59,144 @@ if !(File.file?(entries_file_path))
     File.new(entries_file_path, "w")
 end
 
+def self.is_blank(obj)
+    if obj.strip.empty? || obj == false || obj == [] || obj == {}
+        return true
+    else
+        return false
+    end
+end
+
+def self.convert_platform_codes(platforms_array, game_name)
+    platforms_string = ""
+    ptr = 0
+    platforms_array.each do |platform_code|
+        ptr += 1
+        case platform_code
+        when "WIN"
+            platforms_string += "Microsoft Windows"
+        when "MAC"
+            platforms_string += "MacOS"
+        when "LIN"
+            platforms_string += "Linux"
+        when "AMG"
+            platforms_string += "AmigaOS"
+        when "HAK"
+            platforms_string += "Haiku"
+        when "BSD"
+            platforms_string += "BSD"
+        when "SRN"
+            platforms_string += "SerenityOS"
+        else
+            puts "[ERROR] OS code #{platform_code} in #{game_name}'s entry is invalid.\nExiting..."
+            exit
+        end
+        unless ptr >= platforms_array.length
+            platforms_string += ", "
+        end
+    end
+
+    return platforms_string
+end
+
+def self.validate_and_format_entry(game_name, game_info, category)
+    if is_blank(game_name)
+        puts "[ERROR] One of the game names in #{entries_file} is blank.\nExiting..."
+        exit
+    end
+
+    if game_info == {}
+        puts "[ERROR] Info for game #{game_name} in #{entries_file} is blank.\nExiting..."
+        exit
+    end
+
+    game_icon = game_info["icon"]
+
+    if is_blank(game_icon)
+        game_icon = "https://kridel.me/missing.png"
+    else
+        url_ext = File.extname(game_icon)
+        unless [".jpg", ".jpeg", ".gif", ".png", ".webp"].include?(url_ext)
+            puts "[ERROR] The image link for game #{game_name} in #{entries_file} "\
+                "has the extension #{url_ext}. It's not an image file.\nExiting..."
+            exit
+        end
+    end
+
+    formatted_entry = {
+        game_name => {
+            "ICON" => game_icon,
+            "YEAR" => game_info["year"],
+            "PLATFORMS" => convert_platform_codes(game_info["platforms"], game_name),
+            "PERFORMANCE_INDEX" => game_info["performance"],
+            "TAGS" => game_info["tags"],
+            "CATEGORY" => category
+        }
+    }
+
+    return formatted_entry
+end
+
+game_categories = []
+game_cards = {}
+
+entires_hash = JSON.parse!(File.read(entries_file_path))
+entires_hash.each do |category, cat_contents|
+    game_categories.push(category)
+    cat_contents.each do |game_name, game_info|
+        formatted_entry = validate_and_format_entry(game_name, game_info, category)
+        game_cards.merge!(formatted_entry)
+    end
+end
+
 # -=-=- < /post-load checks > -=-=- #
 
 ##
 # Discord command.
 #
-# Confirms if the present module is loaded or not.
-command :isGameDictLoaded do |event|
-    return "Game dictionary loaded."
+# Displays an information card about a given game.
+#
+# TODO 1: Add more comments.
+#
+# TODO 2: See if we can parse the game name even with spaces.
+command :gameCard do |event, game_name_with_underscores|
+    if game_name_with_underscores == nil
+        return common.getTextFromKey("NO_GAME_NAME_GIVEN")
+    end
+
+    game_name = game_name_with_underscores.gsub("_", " ")
+    game_info = game_cards[game_name]
+    event.channel.send_embed do |embed|
+        embed.title = "#{game_name}"
+        embed.image = Discordrb::Webhooks::EmbedImage.new(url: game_info["ICON"])
+    end
+
+    case game_info["PERFORMANCE_INDEX"]
+    when 1
+        perf_string = common.getTextFromKey("PC_TOASTER")
+    when 2
+        perf_string = common.getTextFromKey("PC_CAPABLE")
+    when 3
+        perf_string = common.getTextFromKey("PC_WARMACHINE")
+    else
+        perf_string = "hmmm. compute."
+    end
+
+    tags_string = ""
+    tag_ptr = 0
+    game_info["TAGS"].each do |tag|
+        tag_ptr += 1
+        tags_string += tag
+        if tag_ptr >= game_info["TAGS"].length
+            tags_string += ", "
+        end
+    end
+
+    return "**#{common.getTextFromKey("GAME_CATEGORY")}**: #{game_info["CATEGORY"].capitalize}\n"\
+        "**#{common.getTextFromKey("GAME_YEAR_OUT")}**: #{game_info["YEAR"]}\n"\
+        "**#{common.getTextFromKey("GAME_PLATFORMS")}**: #{game_info["PLATFORMS"]}\n"\
+        "**#{common.getTextFromKey("GAME_PERFORMANCE")}**: #{perf_string}\n"\
+        "**#{common.getTextFromKey("GAME_TAGS")}**: #{tags_string}\n"\
 end
 
 end

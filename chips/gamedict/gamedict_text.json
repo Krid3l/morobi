@@ -1,6 +1,24 @@
 {
     "english": {
+        "GAME_CATEGORY": "Category",
+        "GAME_YEAR_OUT": "Released",
+        "GAME_PLATFORMS": "Operating systems",
+        "GAME_PERFORMANCE": "Required PC",
+        "GAME_TAGS": "Tags",
+        "PC_TOASTER": "Toaster",
+        "PC_CAPABLE": "Decent computer",
+        "PC_WARMACHINE": "Recent gaming machine",
+        "NO_GAME_NAME_GIVEN": "You didn't give me any game name."
     },
     "french": {
+        "GAME_CATEGORY": "Catégorie ",
+        "GAME_YEAR_OUT": "Année de sortie ",
+        "GAME_PLATFORMS": "Systèmes d'exploitation ",
+        "GAME_PERFORMANCE": "Tourne sur ",
+        "GAME_TAGS": "Mots-clés ",
+        "PC_TOASTER": "Un grille-pain",
+        "PC_CAPABLE": "Un ordi correct",
+        "PC_WARMACHINE": "Une machine taillée pour le jeu",
+        "NO_GAME_NAME_GIVEN": "Tu ne m'as pas donné de nom de jeu."
     }
 }
