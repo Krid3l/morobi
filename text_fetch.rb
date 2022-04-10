@@ -9,11 +9,11 @@ module Mrb_TextFetcher
 def self.getText(key, text_module, vals = [])
     text_to_return = text_module.text[$current_lang][key]
 
-    text_not_found = "Sorry, I could not fetch the queried string #{key} with language code #{$current_lang}."
+    text_not_found = "Sorry, I could not fetch the queried string #{key} with language name #{$current_lang}."
 
-    if text_to_return == ""
-        if lang != "en"
-            ttr_english_fallback = text_module.text["en"][key]
+    if text_to_return == nil || text_to_return == ""
+        if $current_lang != "english"
+            ttr_english_fallback = text_module.text["english"][key]
             if ttr_english_fallback == "" || ttr_english_fallback == nil
                 return text_not_found
             else

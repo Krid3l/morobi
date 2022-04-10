@@ -52,6 +52,10 @@ def self.entries_file
     @entries_file ||= "gamedict_entries.json"
 end
 
+entries_hash = {}
+game_categories = []
+game_cards = {}
+
 # -=-=- Checks running after the chip has been loaded -=-=- #
 
 entries_file_path = "#{File.dirname(__FILE__)}/#{entries_file}"
@@ -137,11 +141,8 @@ def self.validate_and_format_entry(game_name, game_info, category)
     return formatted_entry
 end
 
-game_categories = []
-game_cards = {}
-
-entires_hash = JSON.parse!(File.read(entries_file_path))
-entires_hash.each do |category, cat_contents|
+entries_hash = JSON.parse!(File.read(entries_file_path))
+entries_hash.each do |category, cat_contents|
     game_categories.push(category)
     cat_contents.each do |game_name, game_info|
         formatted_entry = validate_and_format_entry(game_name, game_info, category)
@@ -159,12 +160,20 @@ end
 # TODO 1: Add more comments.
 #
 # TODO 2: See if we can parse the game name even with spaces.
+#
+# TODO 3: Alias system where a single game can be referenced by multiple strings.
+# (e.g. Unreal Tournament 2004, UT2004, UT2k4, etc)
 command :gameCard do |event, game_name_with_underscores|
     if game_name_with_underscores == nil
         return common.getTextFromKey("NO_GAME_NAME_GIVEN")
     end
 
     game_name = game_name_with_underscores.gsub("_", " ")
+
+    unless game_cards.key?(game_name)
+        return common.getTextFromKey("GAME_DOES_NOT_EXIST", [game_name])
+    end
+
     game_info = game_cards[game_name]
     event.channel.send_embed do |embed|
         embed.title = "#{game_name}"
@@ -197,6 +206,31 @@ command :gameCard do |event, game_name_with_underscores|
         "**#{common.getTextFromKey("GAME_PLATFORMS")}**: #{game_info["PLATFORMS"]}\n"\
         "**#{common.getTextFromKey("GAME_PERFORMANCE")}**: #{perf_string}\n"\
         "**#{common.getTextFromKey("GAME_TAGS")}**: #{tags_string}\n"\
+end
+
+command :listGames do |event|
+    response = "**#{common.getTextFromKey("GAME_LIST")}**\n\n"
+
+    entries_hash.each do |category, cat_contents|
+        cat_title_list = []
+        response += "__#{category.capitalize}__\n"
+        cat_contents.each do |game_name, game_info|
+            cat_title_list.push(game_name)
+        end
+
+        ptr = 0
+        cat_title_list.sort.each do |game_name|
+            ptr += 1
+            response += "*#{game_name}*"
+            if ptr >= cat_title_list.length
+                response += "\n\n"
+            else
+                response += ", "
+            end
+        end
+    end
+
+    return response
 end
 
 end

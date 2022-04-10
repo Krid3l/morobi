@@ -8,7 +8,9 @@
         "PC_TOASTER": "Toaster",
         "PC_CAPABLE": "Decent computer",
         "PC_WARMACHINE": "Recent gaming machine",
-        "NO_GAME_NAME_GIVEN": "You didn't give me any game name."
+        "NO_GAME_NAME_GIVEN": "You didn't give me any game name.",
+        "GAME_DOES_NOT_EXIST": "There's no entry with the name \"$_VAL1\" in my game dictionary.",
+        "GAME_LIST": "Here's all the games I have in my memory:"
     },
     "french": {
         "GAME_CATEGORY": "Catégorie ",
@@ -19,6 +21,8 @@
         "PC_TOASTER": "Un grille-pain",
         "PC_CAPABLE": "Un ordi correct",
         "PC_WARMACHINE": "Une machine taillée pour le jeu",
-        "NO_GAME_NAME_GIVEN": "Tu ne m'as pas donné de nom de jeu."
+        "NO_GAME_NAME_GIVEN": "Tu ne m'as pas donné de nom de jeu.",
+        "GAME_DOES_NOT_EXIST": "Je n'ai aucune entrée ayant pour nom \"$_VAL1\" dans mon dictionnaire de jeux.",
+        "GAME_LIST": "Voici la liste des jeux enregistrés :"
     }
 }
