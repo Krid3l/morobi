@@ -57,9 +57,7 @@ command :changeLanguage do |event, lang_name|
         return "You did not give me any language name to work with."
     elsif $loaded_langs.has_key?(lang_name.upcase)
         $current_lang = lang_name
-        return(
-            common.getTextFromKey("LANGUAGE_CHANGE_OK")
-        )
+        return common.getTextFromKey("LANGUAGE_CHANGE_OK")
     else
         return(
             "Hm. The language name \"#{lang_name}\" that you gave me is not "\

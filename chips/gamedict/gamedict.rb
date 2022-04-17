@@ -57,13 +57,16 @@ entries_hash = {}
 game_categories = []
 game_cards = {}
 
-# -=-=- Checks running after the chip has been loaded -=-=- #
+# -=-=- Checks running after the chip has been loaded + toolbox -=-=- #
 
+# create entries file if not present on disk
 entries_file_path = "#{File.dirname(__FILE__)}/#{entries_file}"
 if !(File.file?(entries_file_path))
     File.new(entries_file_path, "w")
 end
 
+##
+# ROR-style empty variable detection.
 def self.is_blank(obj)
     if obj.strip.empty? || obj == false || obj == [] || obj == {}
         return true
@@ -72,6 +75,9 @@ def self.is_blank(obj)
     end
 end
 
+##
+# Converts a three-letter platform code (found in +gamedict_entries.json+
+# entries) into a full platform designation string.
 def self.convert_platform_codes(platforms_array, game_name)
     platforms_string = ""
     ptr = 0
@@ -104,6 +110,9 @@ def self.convert_platform_codes(platforms_array, game_name)
     return platforms_string
 end
 
+##
+# Turns a game entry from +gamedict_entries.json+ into a sub-dict pushed into
+# the game_cards dict
 def self.validate_and_format_entry(game_name, game_info, category)
     if is_blank(game_name)
         puts "[ERROR] One of the game names in #{entries_file} is blank.\nExiting..."
@@ -118,8 +127,10 @@ def self.validate_and_format_entry(game_name, game_info, category)
     game_icon = game_info["icon"]
 
     if is_blank(game_icon)
+        # if no game icon is provided, this MS Paint-made question mark will do
         game_icon = "https://kridel.me/missing.png"
     else
+        # validate the image URL for use as the game's icon
         url_ext = File.extname(game_icon)
         unless [".jpg", ".jpeg", ".gif", ".png", ".webp"].include?(url_ext)
             puts "[ERROR] The image link for game #{game_name} in #{entries_file} "\
@@ -152,19 +163,18 @@ entries_hash.each do |category, cat_contents|
     end
 end
 
-# -=-=- < /post-load checks > -=-=- #
+# -=-=- < /post-load checks + toolbox > -=-=- #
 
 ##
 # Discord command.
 #
 # Displays an information card about a given game.
-#
-# TODO: Add more comments.
 command :gameCard do |event, *game_name|
     if game_name == nil || game_name.empty?
         return common.getTextFromKey("NO_GAME_NAME_GIVEN")
     end
 
+    # game_name (Array) -> str_game_name (String)
     str_game_name = ""
     name_ptr = 0
     game_name.each do |game_name_word|
@@ -175,6 +185,7 @@ command :gameCard do |event, *game_name|
         end
     end
 
+    # check if the command param is one of aliases provided in the game's entry
     alias_found_for = ""
     game_cards.each do |card_game_name, card_game_info|
         game_name_aliases = card_game_info["ALIASES"]
@@ -193,12 +204,14 @@ command :gameCard do |event, *game_name|
         return common.getTextFromKey("GAME_DOES_NOT_EXIST", [str_game_name])
     end
 
+    # fetch game icon
     game_info = game_cards[str_game_name]
     event.channel.send_embed do |embed|
         embed.title = "#{str_game_name}"
         embed.image = Discordrb::Webhooks::EmbedImage.new(url: game_info["ICON"])
     end
 
+    # can this game run on a weak PC?
     case game_info["PERFORMANCE_INDEX"]
     when 1
         perf_string = common.getTextFromKey("PC_TOASTER")
@@ -210,6 +223,7 @@ command :gameCard do |event, *game_name|
         perf_string = "hmmm. compute."
     end
 
+    # stringify game tags
     tags_string = ""
     tag_ptr = 0
     game_info["TAGS"].each do |tag|
@@ -220,6 +234,7 @@ command :gameCard do |event, *game_name|
         end
     end
 
+    # format the actual game card on the fly and display it 
     return "**#{common.getTextFromKey("GAME_CATEGORY")}**: #{game_info["CATEGORY"].capitalize}\n"\
         "**#{common.getTextFromKey("GAME_YEAR_OUT")}**: #{game_info["YEAR"]}\n"\
         "**#{common.getTextFromKey("GAME_PLATFORMS")}**: #{game_info["PLATFORMS"]}\n"\
@@ -227,6 +242,10 @@ command :gameCard do |event, *game_name|
         "**#{common.getTextFromKey("GAME_TAGS")}**: #{tags_string}\n"\
 end
 
+##
+# Discord command.
+#
+# Lists all games defined in +gamedict_entries.json+.
 command :listGames do |event|
     response = "**#{common.getTextFromKey("GAME_LIST")}**\n\n"
 
@@ -237,6 +256,7 @@ command :listGames do |event|
             cat_title_list.push(game_name)
         end
 
+        # add game names from the current category into the response string
         ptr = 0
         cat_title_list.sort.each do |game_name|
             ptr += 1
