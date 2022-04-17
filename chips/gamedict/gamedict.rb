@@ -18,6 +18,7 @@
 # Example :
 #  "Category name": {
 #      "Name of first game": {
+#          "aliases": ["other accepted spellings of the game's name"],
 #          "icon": "optional - insert hyperlink to an image file here",
 #          "year": 2022,
 #          "platforms": ["insert platforms on which the game runs as three-letter codes, see convert_platform_codes() for the list of codes"],
@@ -129,6 +130,7 @@ def self.validate_and_format_entry(game_name, game_info, category)
 
     formatted_entry = {
         game_name => {
+            "ALIASES" => game_info["aliases"],
             "ICON" => game_icon,
             "YEAR" => game_info["year"],
             "PLATFORMS" => convert_platform_codes(game_info["platforms"], game_name),
@@ -157,26 +159,43 @@ end
 #
 # Displays an information card about a given game.
 #
-# TODO 1: Add more comments.
-#
-# TODO 2: See if we can parse the game name even with spaces.
-#
-# TODO 3: Alias system where a single game can be referenced by multiple strings.
-# (e.g. Unreal Tournament 2004, UT2004, UT2k4, etc)
-command :gameCard do |event, game_name_with_underscores|
-    if game_name_with_underscores == nil
+# TODO: Add more comments.
+command :gameCard do |event, *game_name|
+    if game_name == nil || game_name.empty?
         return common.getTextFromKey("NO_GAME_NAME_GIVEN")
     end
 
-    game_name = game_name_with_underscores.gsub("_", " ")
-
-    unless game_cards.key?(game_name)
-        return common.getTextFromKey("GAME_DOES_NOT_EXIST", [game_name])
+    str_game_name = ""
+    name_ptr = 0
+    game_name.each do |game_name_word|
+        name_ptr += 1
+        str_game_name += game_name_word
+        unless name_ptr >= game_name.length
+            str_game_name += " "
+        end
     end
 
-    game_info = game_cards[game_name]
+    alias_found_for = ""
+    game_cards.each do |card_game_name, card_game_info|
+        game_name_aliases = card_game_info["ALIASES"]
+        unless game_name_aliases == nil || game_name_aliases.empty?
+            if game_name_aliases.include?(str_game_name.downcase)
+                alias_found_for = card_game_name
+            end
+        end
+    end
+
+    if alias_found_for != ""
+        str_game_name = alias_found_for
+    end
+
+    unless game_cards.key?(str_game_name)
+        return common.getTextFromKey("GAME_DOES_NOT_EXIST", [str_game_name])
+    end
+
+    game_info = game_cards[str_game_name]
     event.channel.send_embed do |embed|
-        embed.title = "#{game_name}"
+        embed.title = "#{str_game_name}"
         embed.image = Discordrb::Webhooks::EmbedImage.new(url: game_info["ICON"])
     end
 
